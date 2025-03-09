@@ -1,21 +1,19 @@
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import pipeline
 
-def load_model(model_path='./saved_model'):
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = AutoModelForSequenceClassification.from_pretrained(model_path)
-    return tokenizer, model
+def load_inference_pipeline():
+    """Charge le pipeline d'inférence."""
+    model_name = "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
+    return pipeline("text-classification", model=model_name)
 
-def predict_sentiment(text, tokenizer, model):
-    inputs = tokenizer(text, return_tensors='pt', truncation=True, padding=True, max_length=512)
-    with torch.no_grad():
-        outputs = model(**inputs)
-    logits = outputs.logits
-    predicted_class = torch.argmax(logits, dim=1).item()
-    return predicted_class
+def predict_sentiment(pipe, text):
+    """Prédit le sentiment d'un texte donné."""
+    return pipe(text)
 
 if __name__ == "__main__":
-    tokenizer, model = load_model()
-    text = input("Entrez un avis : ")
-    sentiment = predict_sentiment(text, tokenizer, model)
-    print(f"Sentiment prédit : {sentiment}")
+    # Charger le pipeline
+    pipe = load_inference_pipeline()
+
+    # Demander à l'utilisateur de saisir un texte
+    text = input("Entrez le texte pour l'analyse de sentiment: ")
+    result = predict_sentiment(pipe, text)
+    print(f"Sentiment: {result[0]['label']}, Confiance: {result[0]['score']:.4f}")

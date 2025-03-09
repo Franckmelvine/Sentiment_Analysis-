@@ -1,62 +1,59 @@
-import torch
-import pandas as pd
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trainer, TrainingArguments
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
 from datasets import Dataset
-from sklearn.model_selection import train_test_split
+import torch
 
-def load_data(file_path):
-    df = pd.read_csv(file_path)
-    df = df[['content', 'score']].dropna()
-    df['score'] = df['score'] - 1  # Transformer les labels en 0-4 si c'est sur 1-5
-    return df
+def load_model_and_tokenizer():
+    """Charge le modèle et le tokenizer."""
+    model_name = "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSequenceClassification.from_pretrained(model_name)
+    return tokenizer, model
 
-def tokenize_function(examples):
-    return tokenizer(examples['content'], padding='max_length', truncation=True)
+def preprocess_data(tokenizer, examples):
+    """Tokenise les données textuelles."""
+    return tokenizer(examples['content'], padding="max_length", truncation=True)
 
-# Charger les données
-data_path = 'reviews.csv'  # Modifier avec le chemin correct
-df = load_data(data_path)
+def fine_tune_model(tokenizer, model, dataset):
+    """Affine le modèle sur l'ensemble de données."""
+    # Tokeniser le dataset
+    tokenized_dataset = dataset.map(lambda x: preprocess_data(tokenizer, x), batched=True)
 
-# Diviser en train et test
-train_texts, test_texts, train_labels, test_labels = train_test_split(
-    df['content'].tolist(), df['score'].tolist(), test_size=0.2, random_state=42
-)
+    # Diviser le dataset en train et test
+    train_test_split = tokenized_dataset.train_test_split(test_size=0.1)
+    train_dataset = train_test_split['train']
+    test_dataset = train_test_split['test']
 
-# Convertir en Dataset Hugging Face
-train_dataset = Dataset.from_dict({'content': train_texts, 'score': train_labels})
-test_dataset = Dataset.from_dict({'content': test_texts, 'score': test_labels})
+    # Définir les arguments d'entraînement
+    training_args = TrainingArguments(
+        output_dir="./results",
+        evaluation_strategy="epoch",
+        learning_rate=2e-5,
+        per_device_train_batch_size=16,
+        per_device_eval_batch_size=16,
+        num_train_epochs=3,
+        weight_decay=0.01,
+    )
 
-# Charger le modèle et le tokenizer
-model_name = 'nlptown/bert-base-multilingual-uncased-sentiment'  # Modèle BERT pré-entraîné
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=5)
+    # Définir le Trainer
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=test_dataset,
+    )
 
-# Tokenization
-tokenized_train = train_dataset.map(tokenize_function, batched=True)
-tokenized_test = test_dataset.map(tokenize_function, batched=True)
+    # Affiner le modèle
+    trainer.train()
+    return trainer
 
-# Définir les arguments d'entraînement
-training_args = TrainingArguments(
-    output_dir='./results',
-    evaluation_strategy='epoch',
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
-    num_train_epochs=3,
-    weight_decay=0.01,
-    logging_dir='./logs',
-)
+if __name__ == "__main__":
+    # Charger le modèle et le tokenizer
+    tokenizer, model = load_model_and_tokenizer()
 
-# Initialiser le Trainer
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=tokenized_train,
-    eval_dataset=tokenized_test,
-)
+    # Charger votre dataset (supposons que vous avez un DataFrame pandas `df`)
+    import pandas as pd
+    df = pd.read_csv(r"C:\Users\mouke\Documents\aivancity\PGE3\Semestre 2\MLOps\dataset.csv")  # Remplacez par le chemin de votre dataset
+    dataset = Dataset.from_pandas(df)
 
-# Entraîner le modèle
-trainer.train()
-
-# Sauvegarder le modèle
-tokenizer.save_pretrained('./saved_model')
-model.save_pretrained('./saved_model')
+    # Affiner le modèle
+    fine_tune_model(tokenizer, model, dataset)
