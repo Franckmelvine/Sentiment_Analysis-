@@ -50,4 +50,4 @@ if __name__ == "__main__":
     except pd.errors.ParserError as e:
         print(f"Erreur : {e}")
     except Exception as e:
-        print(f"Une erreur inattendue s'est produite : {e}")
+        print(f"Une erreur inattendue s'est produite : {e}")  
