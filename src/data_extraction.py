@@ -34,20 +34,19 @@ def load_data(file_path):
         raise pd.errors.ParserError(f"Erreur lors de la lecture du fichier : {e}")
 
 
-if __name__ == "__main__":
-    file_path = r"C:\Users\Franck Melvine\Documents\Aivancity\Bachelor 3\Semestre 2\ML_Ops\dataset.csv"
-    
-    try:
-        # Charge les données
-        data = load_data(file_path)
-        print("Données chargées avec succès :")
-        print(data.head())  # Affiche les 5 premières lignes du DataFrame
+# Déplacez cette partie en dehors du bloc `if __name__ == "__main__":`
+file_path = r"C:\Users\Franck Melvine\Documents\Aivancity\Bachelor 3\Semestre 2\ML_Ops\dataset.csv"
+try:
+    # Charge les données
+    data = load_data(file_path)
+    print("Données chargées avec succès :")
+    print(data.head())  # Affiche les 5 premières lignes du DataFrame
 
-    except FileNotFoundError as e:
-        print(f"Erreur : {e}")
-    except pd.errors.EmptyDataError as e:
-        print(f"Erreur : {e}")
-    except pd.errors.ParserError as e:
-        print(f"Erreur : {e}")
-    except Exception as e:
-        print(f"Une erreur inattendue s'est produite : {e}")  
+except FileNotFoundError as e:
+    print(f"Erreur : {e}")
+except pd.errors.EmptyDataError as e:
+    print(f"Erreur : {e}")
+except pd.errors.ParserError as e:
+    print(f"Erreur : {e}")
+except Exception as e:
+    print(f"Une erreur inattendue s'est produite : {e}")
