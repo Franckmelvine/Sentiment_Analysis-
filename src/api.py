@@ -10,4 +10,4 @@ class TextInput(BaseModel):
 @app.post("/predict")
 def predict(input: TextInput):
     result = predict_sentiment(input.text)
-    return {"sentiment": result}
+    return {"sentiment": result[0]['label'], "confidence": result[0]['score']}
