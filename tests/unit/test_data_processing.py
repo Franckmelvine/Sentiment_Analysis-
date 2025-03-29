@@ -21,8 +21,8 @@ class TestDataPreprocessing(unittest.TestCase):
             "content": ["Good app!", "Worst experience ever."],
             "score": [5, 1]
         })
-        df = preprocess_data(df)
-        self.assertIn("clean_text", df.columns)
-        self.assertIn("sentiment", df.columns)
+        df_processed = preprocess_data(df)
+        self.assertIn("clean_text", df_processed.columns)
+        self.assertIn("sentiment", df_processed.columns)
         expected = ["positive", "negative"]
-        self.assertEqual(df["sentiment"].tolist(), expected)
+        self.assertEqual(df_processed["sentiment"].tolist(), expected)
