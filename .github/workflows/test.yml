@@ -22,7 +22,7 @@ jobs:
           rm -rf ~/.cache/pip
           pip install --no-cache-dir -r requirements.txt
           pip install flake8
-          python -m spacy download fr-core-news-sm
+          python -c "import spacy.cli; spacy.cli.download('fr-core-news-sm')"
 
       - name: Lint code
         run: flake8 src/ tests/
