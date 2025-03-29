@@ -3,8 +3,15 @@ import os
 import unittest
 import pandas as pd
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
-from data_processing import clean_text, preprocess_data, label_sentiment  # noqa: E402
+# Ajout du chemin du dossier src
+base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src'))
+sys.path.insert(0, base_path)
+
+from data_processing import (  # noqa: E402
+    clean_text,
+    preprocess_data,
+    label_sentiment
+)
 
 
 class TestDataPreprocessing(unittest.TestCase):
@@ -26,3 +33,7 @@ class TestDataPreprocessing(unittest.TestCase):
         self.assertIn("sentiment", df_processed.columns)
         expected = ["positive", "negative"]
         self.assertEqual(df_processed["sentiment"].tolist(), expected)
+
+
+if __name__ == "__main__":
+    unittest.main()

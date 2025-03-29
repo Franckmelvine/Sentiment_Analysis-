@@ -2,7 +2,10 @@ import sys
 import os
 import unittest
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src')))
+# Ajout du chemin du dossier src
+src_path = os.path.join(os.path.dirname(__file__), '..', '..', 'src')
+sys.path.append(os.path.abspath(src_path))
+
 from data_extraction import load_data  # noqa: E402
 
 
