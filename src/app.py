@@ -1,7 +1,6 @@
 import streamlit as st
 from transformers import pipeline
 import matplotlib.colors as mcolors
-import numpy as np
 
 
 st.set_page_config(page_title="Analyse de Sentiments", layout="wide")
