@@ -1,7 +1,7 @@
 import streamlit as st
 from transformers import pipeline
 import matplotlib.colors as mcolors
-
+import numpy as np
 
 st.set_page_config(page_title="Analyse de Sentiments", layout="wide")
 st.title("🧠 Analyse de Sentiments avec BERT")
@@ -9,9 +9,7 @@ st.title("🧠 Analyse de Sentiments avec BERT")
 
 @st.cache_resource(show_spinner="Chargement du modèle...")
 def load_model():
-    model_name = (
-        "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
-    )
+    model_name = "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
     return pipeline("text-classification", model=model_name, device="cpu")
 
 
@@ -34,25 +32,23 @@ def get_color(score, base_color):
     intensity = 0.3 + 0.7 * score
     return (
         f"rgb({int(rgb[0]*255*intensity)}, "
-        f"{int(rgb[1]*255*intensity)}, "
-        f"{int(rgb[2]*255*intensity)})"
+        f"{int(rgb[1]*255*intensity)}, {int(rgb[2]*255*intensity)})"
     )
 
 
 def analyze_sentiment(pipe, text):
     try:
         result = pipe(text, truncation=True, max_length=512)[0]
-        label_info = LABEL_CONFIG.get(result['label'], {
+        label_info = LABEL_CONFIG.get(result["label"], {
             "display": "Inconnu",
             "emoji": "❓",
             "base_color": "#808080"
         })
-
         return {
             "sentiment": label_info["display"],
             "emoji": label_info["emoji"],
-            "confidence": result['score'],
-            "color": get_color(result['score'], label_info["base_color"])
+            "confidence": result["score"],
+            "color": get_color(result["score"], label_info["base_color"])
         }
     except Exception as e:
         st.error(f"Erreur lors de l'analyse: {str(e)}")
@@ -76,7 +72,6 @@ with st.container():
 
 
 pipe = load_model()
-
 
 if analyze_btn and user_input:
     with st.spinner("Analyse en cours..."):
@@ -109,18 +104,17 @@ if analyze_btn and user_input:
                 }}
             </style>
             """,
-            unsafe_allow_html=True,
+            unsafe_allow_html=True
         )
-        st.progress(result['confidence'])
+        st.progress(result["confidence"])
 
 elif analyze_btn and not user_input:
     st.warning("⚠️ Veuillez entrer un texte à analyser")
 
-
 with st.expander("ℹ️ À propos de cette application"):
     st.markdown("""
     Cette application utilise un modèle BERT finetuné pour analyser le sentiment d'un texte.
-    - 😊 **Positif**: Le texte exprime une émotion positive  
-    - 😠 **Négatif**: Le texte exprime une émotion négative  
+    - 😊 **Positif**: Le texte exprime une émotion positive
+    - 😠 **Négatif**: Le texte exprime une émotion négative
     - L'intensité de la couleur correspond au niveau de confiance du modèle
     """)
