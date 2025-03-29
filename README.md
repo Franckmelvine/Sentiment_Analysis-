@@ -1,125 +1,168 @@
 # 💬 Sentiment Analysis Pipeline – MLOps Edition
 
-[![Tests](https://github.com/OwenDiel/sentiment-analysis-pipeline/actions/workflows/test.yml/badge.svg)]
-[![Build](https://github.com/OwenDiel/sentiment-analysis-pipeline/actions/workflows/build.yml/badge.svg)]
-[![Evaluate](https://github.com/OwenDiel/sentiment-analysis-pipeline/actions/workflows/evaluate.yml/badge.svg)]
-
-## 🚀 Objectif
-
-Ce projet implémente une solution complète de détection de sentiments avec un modèle BERT, intégrée dans un pipeline MLOps avec Docker, GitHub Actions, FastAPI et Streamlit.
+[![Tests](https://github.com/votre-utilisateur/sentiment-analysis-pipeline/actions/workflows/test.yml/badge.svg)]
+[![Build](https://github.com/votre-utilisateur/sentiment-analysis-pipeline/actions/workflows/build.yml/badge.svg)]
+[![Evaluate](https://github.com/votre-utilisateur/sentiment-analysis-pipeline/actions/workflows/evaluate.yml/badge.svg)]
 
 ---
 
-## 🧱 Structure du Projet
+## 🎯 Objectif
 
-Sentiment-Analysis-Pipeline/
+Ce projet vise à déployer un modèle BERT de détection de sentiments dans un pipeline complet de MLOps.  
+Il s'agit de la suite directe d’un premier projet où nous avons développé et testé un modèle de classification de sentiments.
+
+---
+
+## 🧱 Structure du projet
+
+```
+sentiment-analysis-pipeline/
+├── src/
+│   ├── data_extraction.py
+│   ├── data_processing.py
+│   ├── model.py
+│   ├── inference.py
+│   ├── evaluate.py
+│   └── api.py               # API FastAPI
+├── tests/
+│   └── unit/
+│       ├── test_model.py
+│       ├── test_inference.py
+├── app.py                   # Interface Streamlit
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
 ├── .github/
 │   └── workflows/
 │       ├── test.yml
 │       ├── evaluate.yml
 │       ├── build.yml
 │       └── release.yml
-├── src/
-│   ├── _init_.py
-│   ├── data_extraction.py
-│   ├── data_processing.py
-│   ├── inference.py
-│   ├── model.py
-│   └── app.py  # Fichier de déploiement
-├── tests/
-│   ├── _init_.py
-│   ├── test_data.py
-│   ├── test_model.py
-│   └── test_api.py
-├── data/
-│   ├── dataset.csv
-│   └── test.txt
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
 ├── README.md
-└── .gitignore
-
+└── rapport_MLOps.pdf
+```
 
 ---
 
 ## ⚙️ Installation locale
 
-git clone https://github.com/Franckmelvine/Sentiment_Analysis-.git
-cd Sentiment_Analysis-
+```bash
+git clone https://github.com/votre-utilisateur/sentiment-analysis-pipeline.git
+cd sentiment-analysis-pipeline
 python -m venv venv
-source venv/bin/activate  # ou venv\Scripts\activate sous Windows
-pip install -r requirements.txt 
+source venv/bin/activate  # sous Windows : venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-## 🐳 Utilisation avec Docker
-### Lancer l'API avec Docker Compose
+---
 
+## 🐳 Exécution avec Docker
+
+### 🔧 Build et lancement de l’API
+
+```bash
 docker compose up --build
+```
 
-Puis accéder à la documentation interactive :
-📍 http://localhost:8000/docs
+📍 L'API est accessible ici : http://localhost:8000/docs
 
-## 🧪 Exemple d’appel API
+---
 
+## 🔁 Utilisation de l’API FastAPI
+
+```http
 POST /predict
 Content-Type: application/json
 
 {
   "text": "This is the best app ever!"
 }
+```
 
-### 📤 Réponse attendue :
+📤 Réponse attendue :
 
+```json
 {
   "sentiment": "positive"
 }
+```
 
-## 🧬 Évaluation du modèle
-L'évaluation est automatisée via GitHub Actions (evaluate.yml) après chaque test.
-Elle génère un fichier metrics.json contenant la précision.
+---
 
-## 🧰 Déploiement Streamlit
-Vous pouvez également utiliser l’interface utilisateur via :
+## 🧪 Exécution des tests
+
+```bash
+pytest
+```
+
+> ✅ Tous les tests unitaires sont dans le dossier `tests/unit/`
+
+---
+
+## 🧬 Évaluation automatique du modèle
+
+- Fichier : `src/evaluate.py`
+- Génère `metrics.json` contenant l'accuracy
+- Le pipeline échoue automatiquement si l'accuracy < 0.75
+
+---
+
+## 🧰 Interface utilisateur (Streamlit)
+
+```bash
 streamlit run app.py
+```
 
-Cela ouvre une interface web locale pour soumettre du texte et obtenir des prédictions de sentiment.
+Interface web simple pour tester rapidement les prédictions de sentiment.
 
-## 🛠️ Workflows GitHub Actions
+---
 
-✅ test.yml : exécute les tests unitaires et vérifie le lint
+## 🛠️ GitHub Actions CI/CD
 
-✅ evaluate.yml : évalue le modèle et stocke les métriques
+| Workflow        | Déclencheur                    | Description                                      |
+|----------------|--------------------------------|--------------------------------------------------|
+| `test.yml`     | push, pull_request             | Exécute les tests unitaires et le linting       |
+| `evaluate.yml` | après succès de `test.yml`     | Évalue le modèle et stocke les métriques        |
+| `build.yml`    | push sur `main`                | Build l’image Docker                            |
+| `release.yml`  | push d’un tag (ex: v1.0.0)      | Crée une release officielle avec changelog      |
 
-✅ build.yml : build Docker sur main
-
-✅ release.yml : création automatique de release via GitHub tags
+---
 
 ## 👥 Auteurs & Répartition
-Étudiant	Tâches principales
-Melvine	Docker, FastAPI, Streamlit, README, Rapport
-Owen	GitHub Actions, tests, évaluation, lint
 
-## 📄 Rapport
-Le rapport rapport_MLOps.pdf fournit :
+| Étudiant      | Tâches principales                          |
+|---------------|---------------------------------------------|
+| **Melvine**   | Docker, FastAPI, Streamlit, README, Rapport |
+| **Owen**      | GitHub Actions, Tests, Évaluation, CI/CD    |
 
-L’architecture technique
+> 🔄 Tous les développements ont été faits en collaboration avec revues de code et pull requests GitHub.
 
-Les choix faits
+---
 
-La répartition des tâches
+## 📄 Rapport de projet
 
-Les problèmes rencontrés et résolus
+📁 `rapport_MLOps.pdf` : contient :
+- L’architecture technique complète
+- Les outils utilisés
+- Les défis rencontrés et solutions
+- Les pistes d’amélioration
+- La répartition des rôles
 
-Des idées d’amélioration future
+---
 
-## 🔮 Améliorations possibles
-Intégration de MLflow pour le suivi d’expériences
+## 🔮 Améliorations futures
 
-Ajout de tests d’intégration API
+- Monitoring avec Prometheus + Grafana
+- Intégration de MLflow pour le suivi des expériences
+- Export CSV des prédictions dans Streamlit
+- Déploiement de l’API sur un vrai serveur ou sur le cloud
 
-Monitoring avec Prometheus + Grafana
+---
 
-Déploiement via AWS / GCP
+## 🏁 Merci
 
-## 🏁 Merci !
+Projet réalisé dans le cadre du module MLOps  
+Mars 2025 – Université / École [Nom de votre établissement]
+
+
 
