@@ -2,29 +2,24 @@ import streamlit as st
 from transformers import pipeline
 import matplotlib.colors as mcolors
 
-# Configuration de la page
 st.set_page_config(page_title="Analyse de Sentiments", layout="wide")
 
 st.title("🧠 Analyse de Sentiments avec BERT")
 
+
 @st.cache_resource(show_spinner="Chargement du modèle...")
 def load_model():
-    model_name = "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
+    model_name = (
+        "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
+    )
     return pipeline("text-classification", model=model_name, device="cpu")
 
 
 LABEL_CONFIG = {
-    "LABEL_0": {
-        "display": "Négatif",
-        "emoji": "😠",
-        "base_color": "#FF0000"
-    },
-    "LABEL_1": {
-        "display": "Positif",
-        "emoji": "😊",
-        "base_color": "#00FF00"
-    }
+    "LABEL_0": {"display": "Négatif", "emoji": "😠", "base_color": "#FF0000"},
+    "LABEL_1": {"display": "Positif", "emoji": "😊", "base_color": "#00FF00"},
 }
+
 
 def get_color(score, base_color):
     rgb = mcolors.hex2color(base_color)
@@ -34,9 +29,7 @@ def get_color(score, base_color):
 
 def analyze_sentiment(pipe, text):
     try:
-        result = pipe(
-            text, truncation=True, max_length=512
-        )[0]
+        result = pipe(text, truncation=True, max_length=512)[0]
         label_info = LABEL_CONFIG.get(result["label"], {
             "display": "Inconnu",
             "emoji": "❓",
@@ -68,7 +61,9 @@ with st.container():
     with col2:
         st.caption("Appuyez sur le bouton pour analyser le texte")
 
+
 pipe = load_model()
+
 
 if analyze_btn and user_input:
     with st.spinner("Analyse en cours..."):
@@ -101,19 +96,20 @@ if analyze_btn and user_input:
                 }}
             </style>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
         st.progress(result["confidence"])
 
 elif analyze_btn and not user_input:
     st.warning("⚠️ Veuillez entrer un texte à analyser")
 
+
 with st.expander("ℹ️ À propos de cette application"):
-    st.markdown(
-        """
-        Cette application utilise un modèle BERT finetuné pour analyser le sentiment d'un texte.
+    st.markdown("""
+        Cette application utilise un modèle BERT finetuné pour analyser le
+        sentiment d'un texte.
+
         - 😊 **Positif**: Le texte exprime une émotion positive
         - 😠 **Négatif**: Le texte exprime une émotion négative
         - L'intensité de la couleur correspond au niveau de confiance du modèle
-        """
-    )
+    """)
