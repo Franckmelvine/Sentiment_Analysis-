@@ -1,23 +1,20 @@
-import os
 import sys
+import os
 import unittest
 import pandas as pd
 
-# Ajouter 'src' au chemin Python
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
-
-from data_processing import (
+from data_processing import (  # noqa: E402
     clean_text,
     remove_stopwords,
     lemmatize_text,
     encode_text,
     label_sentiment,
-    preprocess_data,
+    preprocess_data
 )
 
 
 class TestDataPreprocessing(unittest.TestCase):
-
     def test_clean_text(self):
         text = "Hello, World! 123"
         result = clean_text(text)
@@ -31,7 +28,7 @@ class TestDataPreprocessing(unittest.TestCase):
     def test_lemmatize_text(self):
         text = "running better"
         result = lemmatize_text(text)
-        self.assertEqual(result, "running better")  # à ajuster selon le vrai comportement
+        self.assertEqual(result, "running better")
 
     def test_encode_text(self):
         text = "hello"
@@ -54,7 +51,3 @@ class TestDataPreprocessing(unittest.TestCase):
         self.assertIn("tokens", df.columns)
         self.assertIn("sentiment", df.columns)
         self.assertEqual(df["sentiment"].tolist(), ["positive", "negative"])
-
-
-if __name__ == '__main__':
-    unittest.main()
