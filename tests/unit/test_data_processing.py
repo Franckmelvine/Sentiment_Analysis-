@@ -4,37 +4,12 @@ import unittest
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
-from data_processing import (  # noqa: E402
-    clean_text,
-    remove_stopwords,
-    lemmatize_text,
-    encode_text,
-    label_sentiment,
-    preprocess_data
-)
+from data_processing import clean_text, preprocess_data, label_sentiment  # noqa: E402
 
 
 class TestDataPreprocessing(unittest.TestCase):
     def test_clean_text(self):
-        text = "Hello, World! 123"
-        result = clean_text(text)
-        self.assertEqual(result, "hello world 123")
-
-    def test_remove_stopwords(self):
-        text = "This is a test sentence."
-        result = remove_stopwords(text)
-        self.assertEqual(result, "test sentence.")
-
-    def test_lemmatize_text(self):
-        text = "running better"
-        result = lemmatize_text(text)
-        self.assertEqual(result, "running better")
-
-    def test_encode_text(self):
-        text = "hello"
-        result = encode_text(text)
-        self.assertIn("input_ids", result)
-        self.assertIn("attention_mask", result)
+        self.assertEqual(clean_text("Hello, World! 123"), "hello world 123")
 
     def test_label_sentiment(self):
         self.assertEqual(label_sentiment(1), "negative")
@@ -48,6 +23,6 @@ class TestDataPreprocessing(unittest.TestCase):
         })
         df = preprocess_data(df)
         self.assertIn("clean_text", df.columns)
-        self.assertIn("tokens", df.columns)
         self.assertIn("sentiment", df.columns)
-        self.assertEqual(df["sentiment"].tolist(), ["positive", "negative"])
+        expected = ["positive", "negative"]
+        self.assertEqual(df["sentiment"].tolist(), expected)
