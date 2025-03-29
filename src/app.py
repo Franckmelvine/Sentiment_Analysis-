@@ -67,7 +67,9 @@ with st.container():
 
     col1, col2 = st.columns([1, 3])
     with col1:
-        analyze_btn = st.button("Analyser le sentiment", use_container_width=True)
+        analyze_btn = st.button(
+            "Analyser le sentiment", use_container_width=True
+        )
     with col2:
         st.caption("Appuyez sur le bouton pour analyser le texte")
 
