@@ -1,8 +1,8 @@
 import streamlit as st
 from transformers import pipeline
 import matplotlib.colors as mcolors
-import numpy as np
 
+# Configuration de la page
 st.set_page_config(page_title="Analyse de Sentiments", layout="wide")
 st.title("🧠 Analyse de Sentiments avec BERT")
 
@@ -67,9 +67,7 @@ with st.container():
 
     col1, col2 = st.columns([1, 3])
     with col1:
-        analyze_btn = st.button(
-            "Analyser le sentiment", use_container_width=True
-        )
+        analyze_btn = st.button("Analyser le sentiment", use_container_width=True)
     with col2:
         st.caption("Appuyez sur le bouton pour analyser le texte")
 
@@ -98,7 +96,6 @@ if analyze_btn and user_input:
             """,
             unsafe_allow_html=True
         )
-
         st.markdown(
             f"""
             <style>
@@ -117,7 +114,9 @@ elif analyze_btn and not user_input:
 
 with st.expander("ℹ️ À propos de cette application"):
     st.markdown("""
-    Cette application utilise un modèle BERT finetuné pour analyser le sentiment d'un texte.
+    Cette application utilise un modèle BERT finetuné pour analyser
+    le sentiment d'un texte.
+
     - 😊 **Positif**: Le texte exprime une émotion positive  
     - 😠 **Négatif**: Le texte exprime une émotion négative  
     - L'intensité de la couleur correspond au niveau de confiance du modèle
