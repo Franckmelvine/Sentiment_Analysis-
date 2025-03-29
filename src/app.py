@@ -1,7 +1,6 @@
 import streamlit as st
 from transformers import pipeline
 import matplotlib.colors as mcolors
-import numpy as np
 
 # Configuration de la page
 st.set_page_config(page_title="Analyse de Sentiments", layout="wide")
@@ -45,7 +44,6 @@ def analyze_sentiment(pipe, text):
             "emoji": "❓",
             "base_color": "#808080"
         })
-
         return {
             "sentiment": label_info["display"],
             "emoji": label_info["emoji"],
@@ -57,7 +55,6 @@ def analyze_sentiment(pipe, text):
         return None
 
 
-# Interface utilisateur
 with st.container():
     st.subheader("Testez notre analyseur de sentiments")
     user_input = st.text_area(
@@ -100,12 +97,11 @@ if analyze_btn and user_input:
             unsafe_allow_html=True
         )
 
-        progress_color = result["color"]
         st.markdown(
             f"""
             <style>
                 .stProgress > div > div > div > div {{
-                    background-color: {progress_color};
+                    background-color: {result["color"]};
                 }}
             </style>
             """,
@@ -116,13 +112,10 @@ if analyze_btn and user_input:
 elif analyze_btn and not user_input:
     st.warning("⚠️ Veuillez entrer un texte à analyser")
 
-
 with st.expander("ℹ️ À propos de cette application"):
-    st.markdown(
-        """
-        Cette application utilise un modèle BERT finetuné pour analyser le sentiment d'un texte.
-        - 😊 **Positif**: Le texte exprime une émotion positive  
-        - 😠 **Négatif**: Le texte exprime une émotion négative  
-        - L'intensité de la couleur correspond au niveau de confiance du modèle.
-        """
-    )
+    st.markdown("""
+    Cette application utilise un modèle BERT finetuné pour analyser le sentiment d'un texte.
+    - 😊 **Positif**: Le texte exprime une émotion positive
+    - 😠 **Négatif**: Le texte exprime une émotion négative
+    - L'intensité de la couleur correspond au niveau de confiance du modèle
+    """)
