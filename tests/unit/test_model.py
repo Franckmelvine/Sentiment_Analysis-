@@ -40,15 +40,23 @@ class TestModel(unittest.TestCase):
         inputs = self.tokenizer(sample_text, return_tensors="pt")
         with torch.no_grad():
             outputs = self.model(**inputs)
-        self.assertIn("logits", outputs, "Le modèle ne renvoie pas les logits pour une entrée vide.")
+        self.assertIn(
+            "logits", outputs,
+            "Le modèle ne renvoie pas les logits pour une entrée vide."
+        )
 
     def test_model_long_input(self):
         """Test sur une entrée très longue pour vérifier le traitement des textes longs."""
         sample_text = " ".join(["C'est une super expérience !"] * 100)
-        inputs = self.tokenizer(sample_text, return_tensors="pt", truncation=True, padding=True)
+        inputs = self.tokenizer(
+            sample_text, return_tensors="pt", truncation=True, padding=True
+        )
         with torch.no_grad():
             outputs = self.model(**inputs)
-        self.assertIn("logits", outputs, "Le modèle ne renvoie pas les logits pour un texte long.")
+        self.assertIn(
+            "logits", outputs,
+            "Le modèle ne renvoie pas les logits pour un texte long."
+        )
 
 
 if __name__ == "__main__":
