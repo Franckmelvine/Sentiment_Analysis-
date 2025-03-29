@@ -1,8 +1,8 @@
-# 💬 Sentiment Analysis Pipeline – MLOps Edition
+# 💬 Sentiment Analysis Pipeline – MLOps 
 
-[![Tests](https://github.com/votre-utilisateur/sentiment-analysis-pipeline/actions/workflows/test.yml/badge.svg)]
-[![Build](https://github.com/votre-utilisateur/sentiment-analysis-pipeline/actions/workflows/build.yml/badge.svg)]
-[![Evaluate](https://github.com/votre-utilisateur/sentiment-analysis-pipeline/actions/workflows/evaluate.yml/badge.svg)]
+[![Tests](https://github.com/OwenDiel/Sentiment_Analysis-/actions/workflows/test.yml/badge.svg)]
+[![Build](https://github.com/OwenDiel/Sentiment_Analysis-/actions/workflows/build.yml/badge.svg)]
+[![Evaluate](https://github.com/OwenDiel/Sentiment_Analysis-/actions/workflows/evaluate.yml/badge.svg)]     
 
 ---
 
@@ -38,8 +38,7 @@ sentiment-analysis-pipeline/
 │       ├── evaluate.yml
 │       ├── build.yml
 │       └── release.yml
-├── README.md
-└── rapport_MLOps.pdf
+└── README.md
 ```
 
 ---
@@ -47,8 +46,8 @@ sentiment-analysis-pipeline/
 ## ⚙️ Installation locale
 
 ```bash
-git clone https://github.com/votre-utilisateur/sentiment-analysis-pipeline.git
-cd sentiment-analysis-pipeline
+git clone https://github.com/Franckmelvine/Sentiment_Analysis-.git
+cd Sentiment_Analysis-
 python -m venv venv
 source venv/bin/activate  # sous Windows : venv\Scripts\activate
 pip install -r requirements.txt
@@ -162,7 +161,7 @@ Interface web simple pour tester rapidement les prédictions de sentiment.
 ## 🏁 Merci
 
 Projet réalisé dans le cadre du module MLOps  
-Mars 2025 – Université / École [Nom de votre établissement]
+Mars 2025 – aivancity school for technology business & society
 
 
 
