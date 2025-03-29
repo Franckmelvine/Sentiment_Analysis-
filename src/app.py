@@ -1,21 +1,21 @@
 import streamlit as st
 from transformers import pipeline
 import matplotlib.colors as mcolors
+import numpy as np
 
-# Configuration de la page
+
 st.set_page_config(page_title="Analyse de Sentiments", layout="wide")
-
-# Titre de l'application avec emoji
 st.title("🧠 Analyse de Sentiments avec BERT")
 
 
 @st.cache_resource(show_spinner="Chargement du modèle...")
 def load_model():
-    model_name = "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
+    model_name = (
+        "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
+    )
     return pipeline("text-classification", model=model_name, device="cpu")
 
 
-# Mapping des labels et emojis
 LABEL_CONFIG = {
     "LABEL_0": {
         "display": "Négatif",
@@ -33,7 +33,11 @@ LABEL_CONFIG = {
 def get_color(score, base_color):
     rgb = mcolors.hex2color(base_color)
     intensity = 0.3 + 0.7 * score
-    return f"rgb({int(rgb[0]*255*intensity)}, {int(rgb[1]*255*intensity)}, {int(rgb[2]*255*intensity)})"
+    return (
+        f"rgb({int(rgb[0]*255*intensity)}, "
+        f"{int(rgb[1]*255*intensity)}, "
+        f"{int(rgb[2]*255*intensity)})"
+    )
 
 
 def analyze_sentiment(pipe, text):
@@ -44,6 +48,7 @@ def analyze_sentiment(pipe, text):
             "emoji": "❓",
             "base_color": "#808080"
         })
+
         return {
             "sentiment": label_info["display"],
             "emoji": label_info["emoji"],
@@ -112,10 +117,11 @@ if analyze_btn and user_input:
 elif analyze_btn and not user_input:
     st.warning("⚠️ Veuillez entrer un texte à analyser")
 
+
 with st.expander("ℹ️ À propos de cette application"):
     st.markdown("""
     Cette application utilise un modèle BERT finetuné pour analyser le sentiment d'un texte.
-    - 😊 **Positif**: Le texte exprime une émotion positive
-    - 😠 **Négatif**: Le texte exprime une émotion négative
+    - 😊 **Positif**: Le texte exprime une émotion positive  
+    - 😠 **Négatif**: Le texte exprime une émotion négative  
     - L'intensité de la couleur correspond au niveau de confiance du modèle
     """)
