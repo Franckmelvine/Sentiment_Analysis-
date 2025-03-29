@@ -1,6 +1,8 @@
 spacy==3.7.2
+transformers
+datasets
+torch
 pandas==2.2.2
-transformers==4.49.0
 torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
 fastapi==0.115.8
 uvicorn==0.34.0
