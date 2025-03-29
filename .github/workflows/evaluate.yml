@@ -2,7 +2,7 @@ name: Evaluate Model
 
 on:
   workflow_run:
-    workflows: ["Run Tests"]
+    workflows: ["Run Tests and Lint"]
     types:
       - completed
 
@@ -12,22 +12,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          pip install torch transformers datasets
 
-      - name: Run evaluation
-        run: python src/evaluate.py
+      - name: Evaluate model
+        run: python src/model.py  # Si l'évaluation est dans model.py ou metrics.py
 
-      - name: Upload evaluation metrics
+      - name: Run evaluation script
+        run: python metrics.py
+
+      - name: Upload metrics
         uses: actions/upload-artifact@v3
         with:
-          name: eval-metrics
+          name: model-metrics
           path: metrics.json
+
+      - name: Check accuracy threshold
+        run: |
+          ACCURACY=$(python -c "import json; d=json.load(open('metrics.json')); print(d['accuracy'])")
+          echo "Model accuracy: $ACCURACY"
+          if (( $(echo "$ACCURACY < 0.9" | bc -l) )); then
+            echo "❌ Model accuracy is below threshold (0.9)"
+            exit 1
+          else
+            echo "✅ Model accuracy is acceptable"
+          fi
