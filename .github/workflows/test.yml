@@ -14,10 +14,14 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Show requirements.txt content
+        run: cat requirements.txt
+
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install flake8 torch transformers datasets
+          rm -rf ~/.cache/pip
+          pip install --no-cache-dir -r requirements.txt
+          pip install flake8
           python -m spacy download fr-core-news-sm
 
       - name: Lint code
