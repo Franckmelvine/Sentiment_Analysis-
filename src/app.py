@@ -118,10 +118,10 @@ elif analyze_btn and not user_input:
 
 with st.expander("ℹ️ À propos de cette application"):
     st.markdown("""
-    Cette application utilise un modèle BERT finetuné pour analyser 
+    Cette application utilise un modèle BERT finetuné pour analyser
     le sentiment d'un texte.
     - 😊 **Positif** : Le texte exprime une émotion positive
     - 😠 **Négatif** : Le texte exprime une émotion négative
-    - L'intensité de la couleur correspond au niveau de confiance 
+    - L'intensité de la couleur correspond au niveau de confiance
       du modèle.
     """)
