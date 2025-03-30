@@ -10,87 +10,38 @@ jobs:
   evaluate:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15  # Prévention des runs infinis
 
     steps:
-      # Étape 1: Checkout du code
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Pour avoir l'historique complet si nécessaire
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Étape 2: Configuration Python
-      - name: Set up Python 3.10
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          cache: 'pip'  # Activation du cache pour les dépendances
-          cache-dependency-path: 'requirements.txt'
 
-      # Étape 3: Installation des dépendances
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install torch transformers datasets scikit-learn pandas numpy
-          pip install jq  # Pour le traitement JSON dans les scripts CI
+          pip install torch transformers datasets
 
-      # Étape 4: Exécution de l'évaluation
-      - name: Run model evaluation
-        id: eval
-        run: |
-          python src/evaluate.py \
-            --model-path ./models/current_model \
-            --test-data ./data/processed/test_dataset.csv \
-            --output-file metrics.json \
-            --confusion-matrix confusion_matrix.png
+      - name: Run evaluation script
+        run: python metrics.py
 
-          echo "METRICS=$(cat metrics.json | jq -c .)" >> $GITHUB_OUTPUT
-
-      # Étape 5: Publication des résultats
-      - name: Upload evaluation artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload metrics
+        uses: actions/upload-artifact@v2
         with:
-          name: model-evaluation-${{ github.run_number }}
-          path: |
-            metrics.json
-            confusion_matrix.png
-            evaluation_report.html  # Si généré par vos scripts
+          name: model-metrics
+          path: metrics.json
 
-      # Étape 6: Validation des métriques
-      - name: Check quality metrics
+      - name: Check accuracy threshold
         run: |
-          # Seuils configurables
-          MIN_ACCURACY=0.85
-          MAX_F1=0.80
-
-          # Extraction des métriques
-          ACCURACY=$(jq -r '.accuracy' metrics.json)
-          F1_SCORE=$(jq -r '.f1_score' metrics.json)
-
-          # Affichage des résultats
-          echo "=== Model Performance ==="
-          echo "Accuracy: $ACCURACY (Minimum: $MIN_ACCURACY)"
-          echo "F1 Score: $F1_SCORE (Minimum: $MAX_F1)"
-
-          # Validation
-          if (( $(echo "$ACCURACY < $MIN_ACCURACY" | bc -l) )); then
-            echo "::error::Model accuracy ($ACCURACY) below threshold ($MIN_ACCURACY)"
+          ACCURACY=$(python -c "import json; d=json.load(open('metrics.json')); print(d['accuracy'])")
+          echo "Model accuracy: $ACCURACY"
+          if (( $(echo "$ACCURACY < 0.9" | bc -l) )); then
+            echo "❌ Model accuracy is below threshold (0.9)"
             exit 1
+          else
+            echo "✅ Model accuracy is acceptable"
           fi
-
-          if (( $(echo "$F1_SCORE < $MAX_F1" | bc -l) )); then
-            echo "::error::Model F1 score ($F1_SCORE) below threshold ($MAX_F1)"
-            exit 1
-          fi
-
-          echo "::notice::Model validation successful"
-
-      # Étape optionnelle: Notification Slack (à décommenter si configuré)
-      # - name: Slack notification
-      #   uses: slackapi/slack-github-action@v1
-      #   with:
-      #     channel-id: 'model-monitoring'
-      #     slack-message: "Model evaluation completed - Accuracy: ${{ steps.eval.outputs.METRICS.accuracy }}"
-      #   env:
-      #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
