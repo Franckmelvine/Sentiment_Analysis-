@@ -27,13 +27,16 @@ jobs:
           pip install torch transformers datasets
 
       - name: Run evaluation script
-        run: python metrics.py
+        run: python evaluate.py
 
       - name: Upload metrics
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: model-metrics
           path: metrics.json
+
+      - name: Install bc (required for float comparison)
+        run: sudo apt-get update && sudo apt-get install -y bc
 
       - name: Check accuracy threshold
         run: |
