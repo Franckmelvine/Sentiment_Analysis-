@@ -26,7 +26,7 @@ jobs:
           pip install torch transformers datasets
 
       - name: Evaluate model
-        run: python src/model.py || true  # ← évite de bloquer s'il est optionnel
+        run: python src/model.py || true  # <-- si le script est optionnel
 
       - name: Run evaluation script
         run: python metrics.py
