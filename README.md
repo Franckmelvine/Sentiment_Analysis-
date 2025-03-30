@@ -17,27 +17,33 @@ Il s'agit de la suite directe d’un premier projet où nous avons développé e
 
 ```
 sentiment-analysis-pipeline/
-├── src/
-│   ├── data_extraction.py
-│   ├── data_processing.py
-│   ├── model.py
-│   ├── inference.py
-│   ├── evaluate.py
-│   └── api.py               # API FastAPI
-├── tests/
-│   └── unit/
-│       ├── test_model.py
-│       ├── test_inference.py
-├── app.py                   # Interface Streamlit
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
 ├── .github/
 │   └── workflows/
 │       ├── test.yml
 │       ├── evaluate.yml
 │       ├── build.yml
 │       └── release.yml
+├── src/
+│   ├── data_extraction.py
+│   ├── data_processing.py
+│   ├── model.py
+│   ├── inference.py
+│   ├── app.py                   # Interface Streamlit
+│   ├── api.py                   # API FastAPI
+│   ├── evaluate.py
+│   └── performance_report.py
+├── tests/
+│   └── unit/
+│       ├── test_model.py
+│       ├── test_inference.py
+│       ├── test_data_extraction.py
+│       ├── test_data_processing.py
+├── .flake8
+├── .gitignore
+├── Dockerfile
+├── Dockerfile.api
+├── docker-compose.yml
+├── requirements.txt
 └── README.md
 ```
 
@@ -57,13 +63,14 @@ pip install -r requirements.txt
 
 ## 🐳 Exécution avec Docker
 
-### 🔧 Build et lancement de l’API
+### 🔧 Lancer à la fois l’API FastAPI et l’interface Streamlit :
 
 ```bash
 docker compose up --build
 ```
 
-📍 L'API est accessible ici : http://localhost:8000/docs
+- 📍 Interface utilisateur : http://localhost:8001  
+- 📍 Swagger API : http://localhost:8000/docs
 
 ---
 
@@ -82,7 +89,8 @@ Content-Type: application/json
 
 ```json
 {
-  "sentiment": "positive"
+  "sentiment": "positive",
+  "confidence": 0.9876
 }
 ```
 
@@ -100,30 +108,85 @@ pytest
 
 ## 🧬 Évaluation automatique du modèle
 
-- Fichier : `src/evaluate.py`
-- Génère `metrics.json` contenant l'accuracy
-- Le pipeline échoue automatiquement si l'accuracy < 0.75
+- Script : `src/evaluate.py`
+- Génère un fichier `metrics.json` contenant l'accuracy
+- Le pipeline GitHub échoue si accuracy < 0.75
 
 ---
 
-## 🧰 Interface utilisateur (Streamlit)
+## 🎨 Interface utilisateur (Streamlit)
 
 ```bash
-streamlit run app.py
+streamlit run src/app.py
 ```
 
-Interface web simple pour tester rapidement les prédictions de sentiment.
+Permet de tester manuellement le modèle avec retour visuel et coloré.
 
 ---
 
 ## 🛠️ GitHub Actions CI/CD
 
-| Workflow        | Déclencheur                    | Description                                      |
-|----------------|--------------------------------|--------------------------------------------------|
-| `test.yml`     | push, pull_request             | Exécute les tests unitaires et le linting       |
-| `evaluate.yml` | après succès de `test.yml`     | Évalue le modèle et stocke les métriques        |
-| `build.yml`    | push sur `main`                | Build l’image Docker                            |
-| `release.yml`  | push d’un tag (ex: v1.0.0)      | Crée une release officielle avec changelog      |
+| Workflow        | Déclencheur                  | Description                                      |
+|----------------|------------------------------|--------------------------------------------------|
+| `test.yml`     | push, pull_request           | Exécute linting + tests unitaires               |
+| `evaluate.yml` | après succès de `test.yml`   | Évalue les performances et vérifie l’accuracy   |
+| `build.yml`    | push sur `main`              | Build et push l’image Docker vers GHCR          |
+| `release.yml`  | push d’un tag (ex: v1.0.0)   | Crée automatiquement une release GitHub         |
+
+---
+
+## 📚 Documentation Technique
+
+### 🧠 Architecture MLOps
+
+- **Modèle** : BERT fine-tuné via Hugging Face
+- **API** : FastAPI pour servir le modèle
+- **Interface utilisateur** : Streamlit
+- **Docker** : pour packager API + interface
+- **GitHub Actions** : pour tout automatiser via CI/CD
+
+---
+
+### ⚙️ Choix techniques
+
+- 🔹 **Transformers (HuggingFace)** pour le NLP
+- 🔹 **FastAPI** pour exposer le modèle en REST
+- 🔹 **Docker** pour une portabilité maximale
+- 🔹 **GitHub Actions** pour automatiser tests, évaluation, build et release
+- 🔹 **.flake8** pour le style de code
+
+---
+
+### 🔄 Flux de travail automatisé
+
+1. Dev push son code sur GitHub
+2. `test.yml` est lancé : lint + tests
+3. Si succès, `evaluate.yml` est déclenché :
+   - évalue les performances
+   - échoue si accuracy < 0.75
+   - stocke les résultats
+4. Si tout est OK, `build.yml` crée et pousse l'image Docker
+5. Une release peut être créée via un tag Git (ex: `v1.0.0`)
+
+---
+
+## 📈 Monitoring des performances
+
+### Script automatique : `src/performance_report.py`
+
+Permet d’afficher les résultats de `metrics.json` :
+
+```bash
+python src/performance_report.py
+```
+
+Exemple de sortie :
+```
+📊 Rapport de performance :
+- Accuracy : 84.20%
+```
+
+🔁 Intégré automatiquement dans le workflow `evaluate.yml`.
 
 ---
 
@@ -134,13 +197,13 @@ Interface web simple pour tester rapidement les prédictions de sentiment.
 | **Melvine**   | Docker, FastAPI, Streamlit, README, Rapport |
 | **Owen**      | GitHub Actions, Tests, Évaluation, CI/CD    |
 
-> 🔄 Tous les développements ont été faits en collaboration avec revues de code et pull requests GitHub.
+> 🔄 Collaboration constante via GitHub : pull requests, revue de code, échanges sur les erreurs
 
 ---
 
 ## 📄 Rapport de projet
 
-📁 `rapport_MLOps.pdf` : contient :
+📁 `Rapport_MLOps_Owen_et_Melvine.pdf` : contient :
 - L’architecture technique complète
 - Les outils utilisés
 - Les défis rencontrés et solutions
@@ -151,17 +214,14 @@ Interface web simple pour tester rapidement les prédictions de sentiment.
 
 ## 🔮 Améliorations futures
 
-- Monitoring avec Prometheus + Grafana
-- Intégration de MLflow pour le suivi des expériences
-- Export CSV des prédictions dans Streamlit
-- Déploiement de l’API sur un vrai serveur ou sur le cloud
+- Monitoring Prometheus + Grafana
+- Tracking des modèles avec MLflow
+- Déploiement sur cloud (Railway, Azure, Heroku…)
+- Tests d’intégration complets sur l’API
 
 ---
 
 ## 🏁 Merci
 
-Projet réalisé dans le cadre du module MLOps  
-Mars 2025 – aivancity school for technology business & society
-
-
-
+Projet réalisé dans le cadre du module **MLOps**  
+📆 Mars 2025 – *aivancity school for technology business & society*
