@@ -35,6 +35,10 @@ jobs:
           name: model-metrics
           path: metrics.json
 
+      - name: Générer un mini-rapport
+        run: python performance_report.py
+        
+
       - name: Check accuracy threshold
         run: |
           ACCURACY=$(python -c "import json; d=json.load(open('metrics.json')); print(d['accuracy'])")
