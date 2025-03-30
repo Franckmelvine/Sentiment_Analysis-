@@ -27,10 +27,10 @@ jobs:
           pip install torch transformers datasets scikit-learn
 
       - name: Run evaluation script
-        run: python evaluate.py
+        run: python src/evaluate.py  # ✅ Corrigé ici
 
       - name: Upload metrics
-        uses: actions/upload-artifact@main  # ✅ Corrigé ici
+        uses: actions/upload-artifact@main
         with:
           name: model-metrics
           path: metrics.json
