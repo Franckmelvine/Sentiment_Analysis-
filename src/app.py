@@ -2,8 +2,10 @@ import streamlit as st
 from transformers import pipeline
 import matplotlib.colors as mcolors
 
+
 st.set_page_config(page_title="Analyse de Sentiments", layout="wide")
 st.title("🧠 Analyse de Sentiments avec BERT")
+
 
 @st.cache_resource(show_spinner="Chargement du modèle...")
 def load_model():
@@ -11,6 +13,7 @@ def load_model():
         "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
     )
     return pipeline("text-classification", model=model_name, device="cpu")
+
 
 LABEL_CONFIG = {
     "LABEL_0": {
@@ -69,6 +72,7 @@ with st.container():
         analyze_btn = st.button("Analyser le sentiment", use_container_width=True)
     with col2:
         st.caption("Appuyez sur le bouton pour analyser le texte")
+
 
 pipe = load_model()
 
