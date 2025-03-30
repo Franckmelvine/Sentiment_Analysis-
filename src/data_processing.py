@@ -1,31 +1,39 @@
 import re
-from transformers import AutoTokenizer
+import pandas as pd
+from typing import List
 
-tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
+import unicodedata
 
-def clean_text(text):
-    """Nettoie le texte brut en supprimant la ponctuation et les majuscules."""
+def clean_text(text: str) -> str:
+    """Nettoie le texte en supprimant les accents et la ponctuation"""
+    # Normalise les caractères (décompose les accents)
+    text = unicodedata.normalize('NFKD', text)
+    # Supprime les caractères diacritiques (accents)
+    text = ''.join([c for c in text if not unicodedata.combining(c)])
+    # Convertit en minuscule
     text = text.lower()
-    text = re.sub(r"[^\w\s]", "", text)
+    # Remplace les apostrophes
+    text = text.replace("'", " ")
+    # Supprime les caractères spéciaux
+    text = re.sub(r'[^a-z0-9\s]', '', text)
+    # Supprime les espaces multiples
+    text = re.sub(r'\s+', ' ', text).strip()
     return text
 
-
-def label_sentiment(score):
-    """Attribue un label de sentiment selon le score."""
+def label_sentiment(score: int) -> str:
+    """Convertit un score numérique en label de sentiment"""
     if score <= 2:
         return "negative"
-    elif score == 3:
+    elif 3 <= score <= 4:
         return "neutral"
     else:
         return "positive"
 
-
-def preprocess_data(df):
-    """Ajoute des colonnes nettoyées et étiquetées."""
-    df["clean_text"] = df["content"].apply(clean_text)
-    df["sentiment"] = df["score"].apply(label_sentiment)
-    df["tokens"] = df["clean_text"].apply(
-        lambda x: tokenizer(x, truncation=True, padding="max_length")
-    )
+def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Prétraite un dataframe de données textuelles"""
+    df = df.copy()
+    df['clean_text'] = df['content'].apply(clean_text)
+    df['tokens'] = df['clean_text'].apply(lambda x: x.split())
+    df['sentiment'] = df['score'].apply(label_sentiment)
     return df
