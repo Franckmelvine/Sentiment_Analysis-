@@ -9,8 +9,10 @@ st.title("🧠 Analyse de Sentiments avec BERT")
 
 @st.cache_resource(show_spinner="Chargement du modèle...")
 def load_model():
-    model_name = "arindamatcalgm/w266_model4_BERT_" \
-                "AutoModelForSequenceClassification"
+    model_name = (
+        "arindamatcalgm/w266_model4_BERT_"
+        "AutoModelForSequenceClassification"
+    )
     return pipeline("text-classification", model=model_name, device="cpu")
 
 
@@ -39,7 +41,7 @@ def analyze_sentiment(pipe, text):
     try:
         result = pipe(text, truncation=True, max_length=512)[0]
         label_info = LABEL_CONFIG.get(
-            result['label'],
+            result["label"],
             {
                 "display": "Inconnu",
                 "emoji": "❓",
@@ -49,27 +51,28 @@ def analyze_sentiment(pipe, text):
         return {
             "sentiment": label_info["display"],
             "emoji": label_info["emoji"],
-            "confidence": result['score'],
-            "color": get_color(result['score'], label_info["base_color"])
+            "confidence": result["score"],
+            "color": get_color(result["score"], label_info["base_color"])
         }
     except Exception as e:
-        st.error(f"Erreur lors de l'analyse: {str(e)}")
+        st.error(f"Erreur lors de l'analyse : {str(e)}")
         return None
 
 
 with st.container():
     st.subheader("Testez notre analyseur de sentiments")
     user_input = st.text_area(
-        "Entrez votre texte ici:",
+        "Entrez votre texte ici :",
         "",
         height=150,
-        placeholder="Ex: Je suis très heureux d'utiliser cette application !"
+        placeholder="Ex : Je suis très heureux d'utiliser cette application !"
     )
 
     col1, col2 = st.columns([1, 3])
     with col1:
         analyze_btn = st.button(
-            "Analyser le sentiment", use_container_width=True
+            "Analyser le sentiment",
+            use_container_width=True
         )
     with col2:
         st.caption("Appuyez sur le bouton pour analyser le texte")
@@ -94,8 +97,7 @@ if analyze_btn and user_input:
                 <h3 style='color: {result["color"]}'>
                     {result["sentiment"]} {result["emoji"]}
                 </h3>
-                <p>Confiance: <strong>
-                    {result['confidence']:.1%}</strong></p>
+                <p>Confiance : <strong>{result['confidence']:.1%}</strong></p>
             </div>
             """,
             unsafe_allow_html=True
@@ -111,17 +113,20 @@ if analyze_btn and user_input:
             """,
             unsafe_allow_html=True
         )
-        st.progress(result['confidence'])
+        st.progress(result["confidence"])
 
 elif analyze_btn and not user_input:
     st.warning("⚠️ Veuillez entrer un texte à analyser")
 
+
 with st.expander("ℹ️ À propos de cette application"):
-    st.markdown("""
-    Cette application utilise un modèle BERT finetuné pour analyser
-    le sentiment d'un texte.
-    - 😊 **Positif** : Le texte exprime une émotion positive
-    - 😠 **Négatif** : Le texte exprime une émotion négative
-    - L'intensité de la couleur correspond au niveau de confiance
-      du modèle.
-    """)
+    st.markdown(
+        """
+        Cette application utilise un modèle BERT finetuné pour analyser
+        le sentiment d'un texte.
+        - 😊 **Positif** : Le texte exprime une émotion positive
+        - 😠 **Négatif** : Le texte exprime une émotion négative
+        - L'intensité de la couleur correspond au niveau de confiance
+          du modèle.
+        """
+    )
