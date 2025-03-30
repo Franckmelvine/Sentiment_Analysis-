@@ -1,5 +1,4 @@
 import unittest
-import os
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
