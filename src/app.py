@@ -9,9 +9,8 @@ st.title("🧠 Analyse de Sentiments avec BERT")
 
 @st.cache_resource(show_spinner="Chargement du modèle...")
 def load_model():
-    model_name = (
-        "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
-    )
+    model_name = "arindamatcalgm/w266_model4_BERT_" \
+                "AutoModelForSequenceClassification"
     return pipeline("text-classification", model=model_name, device="cpu")
 
 
@@ -69,7 +68,9 @@ with st.container():
 
     col1, col2 = st.columns([1, 3])
     with col1:
-        analyze_btn = st.button("Analyser le sentiment", use_container_width=True)
+        analyze_btn = st.button(
+            "Analyser le sentiment", use_container_width=True
+        )
     with col2:
         st.caption("Appuyez sur le bouton pour analyser le texte")
 
@@ -93,7 +94,8 @@ if analyze_btn and user_input:
                 <h3 style='color: {result["color"]}'>
                     {result["sentiment"]} {result["emoji"]}
                 </h3>
-                <p>Confiance: <strong>{result['confidence']:.1%}</strong></p>
+                <p>Confiance: <strong>
+                    {result['confidence']:.1%}</strong></p>
             </div>
             """,
             unsafe_allow_html=True
@@ -118,8 +120,8 @@ with st.expander("ℹ️ À propos de cette application"):
     st.markdown("""
     Cette application utilise un modèle BERT finetuné pour analyser 
     le sentiment d'un texte.
-    - 😊 **Positif**: Le texte exprime une émotion positive  
-    - 😠 **Négatif**: Le texte exprime une émotion négative  
+    - 😊 **Positif** : Le texte exprime une émotion positive
+    - 😠 **Négatif** : Le texte exprime une émotion négative
     - L'intensité de la couleur correspond au niveau de confiance 
-    du modèle
+      du modèle.
     """)
