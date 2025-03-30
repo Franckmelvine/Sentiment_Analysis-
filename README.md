@@ -69,10 +69,8 @@ pip install -r requirements.txt
 docker compose up --build
 ```
 
-- 📍 Interface utilisateur streamlit: http://localhost:8000  
-  ![WhatsApp Image 2025-03-30 à 22 29 09_b21f43f3](https://github.com/user-attachments/assets/bcdbec20-b13f-4b24-a4f5-1a22adecb329)
-
-
+- 📍 Interface utilisateur streamlit: http://localhost:8000
+- 📍 Interface APIFast: http://localhost:8001  
 ---
 
 ## 🧪 Exécution des tests
@@ -98,6 +96,8 @@ pytest
 ```bash
 streamlit run src/app.py
 ```
+![WhatsApp Image 2025-03-30 à 22 29 09_b21f43f3](https://github.com/user-attachments/assets/bcdbec20-b13f-4b24-a4f5-1a22adecb329)
+
 
 Permet de tester manuellement le modèle avec retour visuel et coloré.
 
