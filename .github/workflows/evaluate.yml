@@ -30,13 +30,10 @@ jobs:
         run: python evaluate.py
 
       - name: Upload metrics
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: model-metrics
           path: metrics.json
-
-      - name: Install bc (required for float comparison)
-        run: sudo apt-get update && sudo apt-get install -y bc
 
       - name: Check accuracy threshold
         run: |
