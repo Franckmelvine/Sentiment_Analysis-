@@ -69,30 +69,9 @@ pip install -r requirements.txt
 docker compose up --build
 ```
 
-- 📍 Interface utilisateur : http://localhost:8001  
-- 📍 Swagger API : http://localhost:8000/docs
+- 📍 Interface utilisateur streamlit: http://localhost:8000  
+  ![WhatsApp Image 2025-03-30 à 22 29 09_b21f43f3](https://github.com/user-attachments/assets/bcdbec20-b13f-4b24-a4f5-1a22adecb329)
 
----
-
-## 🔁 Utilisation de l’API FastAPI
-
-```http
-POST /predict
-Content-Type: application/json
-
-{
-  "text": "This is the best app ever!"
-}
-```
-
-📤 Réponse attendue :
-
-```json
-{
-  "sentiment": "positive",
-  "confidence": 0.9876
-}
-```
 
 ---
 
