@@ -1,6 +1,5 @@
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 
 def load_trained_model(model_path):
@@ -24,7 +23,8 @@ def predict_sentiment(model_path, text):
 
 
 if __name__ == "__main__":
-    model_path = "results/logs"
+    # ✅ Pour tester localement, utilise un modèle public
+    model_path = "nlptown/bert-base-multilingual-uncased-sentiment"
     text = "J'adore cette expérience, c'est incroyable !"
     prediction = predict_sentiment(model_path, text)
     print(

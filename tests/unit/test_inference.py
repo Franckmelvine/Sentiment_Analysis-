@@ -1,10 +1,11 @@
 import unittest
-from inference import predict_sentiment
+from src.inference import predict_sentiment  # ✅ Assure-toi que le chemin est correct
 
 
 class TestInference(unittest.TestCase):
     def setUp(self):
-        self.model_path = "./results"
+        # ✅ Utilisation d’un modèle public compatible pour éviter l’erreur de config
+        self.model_path = "nlptown/bert-base-multilingual-uncased-sentiment"
 
     def test_prediction_output(self):
         sample_text = "J'adore ce produit, il est génial !"
