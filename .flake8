@@ -3,7 +3,7 @@ max-line-length = 88
 ignore =
     E203,  # Espace avant ':' (incompatible avec black)
     W503,  # Ligne brisée avant opérateur
-    E501   # Lignes trop longues (géré par black)
+    E501   # Ligne trop longue (géré par black)
 exclude =
     .venv,
     __pycache__,
