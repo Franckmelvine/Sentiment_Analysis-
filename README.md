@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/OwenDiel/Sentiment_Analysis-/actions/workflows/test.yml/badge.svg)]
 [![Build](https://github.com/OwenDiel/Sentiment_Analysis-/actions/workflows/build.yml/badge.svg)]
+[![Release](https://github.com/OwenDiel/Sentiment_Analysis-/actions/workflows/release.yml/badge.svg)]
 [![Evaluate](https://github.com/OwenDiel/Sentiment_Analysis-/actions/workflows/evaluate.yml/badge.svg)]     
 
 ---
