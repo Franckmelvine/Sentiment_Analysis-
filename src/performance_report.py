@@ -19,7 +19,7 @@ def generate_report(metrics_path="metrics.json"):
         try:
             formatted = f"{val:.2%}" if isinstance(val, float) else val
             print(f"- {key.capitalize()} : {formatted}")
-        except Exception as e:
+        except Exception:
             print(f"- {key.capitalize()} : {val} (⚠️ Format non reconnu)")
 
 
