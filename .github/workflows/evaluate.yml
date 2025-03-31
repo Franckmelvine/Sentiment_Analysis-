@@ -36,7 +36,7 @@ jobs:
           path: metrics.json
 
       - name: Générer un mini-rapport
-        run: python performance_report.py
+        run: python src/performance_report.py
         
 
       - name: Check accuracy threshold
