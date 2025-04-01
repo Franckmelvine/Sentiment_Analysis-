@@ -1,21 +1,36 @@
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+import os
+os.environ["TRANSFORMERS_NO_TF"] = "1"
 
-def load_model(model_path='./saved_model'):
+from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+
+def load_trained_model(model_path):
+    """Charge le modèle et le tokenizer entraînés."""
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     model = AutoModelForSequenceClassification.from_pretrained(model_path)
     return tokenizer, model
 
-def predict_sentiment(text, tokenizer, model):
-    inputs = tokenizer(text, return_tensors='pt', truncation=True, padding=True, max_length=512)
-    with torch.no_grad():
-        outputs = model(**inputs)
-    logits = outputs.logits
-    predicted_class = torch.argmax(logits, dim=1).item()
-    return predicted_class
+
+def predict_sentiment(model_path, text):
+    """Prédit le sentiment d'un texte donné."""
+    tokenizer, model = load_trained_model(model_path)
+    classifier = pipeline(
+        "text-classification",
+        model=model,
+        tokenizer=tokenizer,
+        device=0 if torch.cuda.is_available() else -1
+    )
+    result = classifier(text)[0]
+    return result
+
 
 if __name__ == "__main__":
-    tokenizer, model = load_model()
-    text = input("Entrez un avis : ")
-    sentiment = predict_sentiment(text, tokenizer, model)
-    print(f"Sentiment prédit : {sentiment}")
+    # ✅ Pour tester localement, utilise un modèle public
+    model_path = "nlptown/bert-base-multilingual-uncased-sentiment"
+    text = "J'adore cette expérience, c'est incroyable !"
+    prediction = predict_sentiment(model_path, text)
+    print(
+        f"Texte: {text}\nPrédiction: {prediction['label']} "
+        f"(Score: {prediction['score']:.4f})"
+    )
