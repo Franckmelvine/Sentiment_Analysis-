@@ -1,3 +1,6 @@
+import os
+os.environ["TRANSFORMERS_NO_TF"] = "1"
+
 from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 import torch
 
