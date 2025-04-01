@@ -1,18 +1,18 @@
 import unittest
-from src.inference import load_inference_pipeline, predict_sentiment
+from src.inference import predict_sentiment
+
 
 class TestInference(unittest.TestCase):
-    def test_predict_sentiment(self):
-        # Charger le pipeline
-        pipe = load_inference_pipeline()
+    def setUp(self):
+        self.model_path = "nlptown/bert-base-multilingual-uncased-sentiment"
 
-        # Tester un texte
-        text = "Ceci est un test positif."
-        result = predict_sentiment(pipe, text)
+    def test_prediction_output(self):
+        sample_text = "J'adore ce produit, il est génial !"
+        result = predict_sentiment(self.model_path, sample_text)
 
-        # Vérifier que le résultat contient un label et un score
-        self.assertIn('label', result[0])
-        self.assertIn('score', result[0])
-
-if __name__ == "__main__":
-    unittest.main()
+        self.assertIn("label", result)
+        self.assertIn("score", result)
+        self.assertIsInstance(result["label"], str)
+        self.assertIsInstance(result["score"], float)
+        self.assertGreaterEqual(result["score"], 0.0)
+        self.assertLessEqual(result["score"], 1.0)

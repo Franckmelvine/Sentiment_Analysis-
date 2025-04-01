@@ -1,12 +1,22 @@
-version: "3.8"
+version: "3.9"
 
 services:
-  sentiment_api:
-    build: .
+  streamlit-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8000:8000"  # Streamlit sur localhost:8000
     volumes:
-      - ./models:/app/models
-      - ./data:/app/data
-    environment:
-      - MODEL_PATH=models/sentiment_model.pt
+      - .:/app
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8001:8000"  # API sera disponible sur localhost:8001
+    volumes:
+      - .:/app
