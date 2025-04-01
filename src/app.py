@@ -100,7 +100,7 @@ if analyze_btn and user_input:
                 <p>Confiance : <strong>{result['confidence']:.1%}</strong></p>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True  
         )
 
         st.markdown(
