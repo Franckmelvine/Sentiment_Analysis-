@@ -1,44 +1,32 @@
-import pandas as pd
 import re
-from transformers import AutoTokenizer
-from unidecode import unidecode  # Nouvelle importation
+import pandas as pd
+import unicodedata
 
-# Charger le tokenizer BERT
-tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
-def clean_text(text):
-    """Nettoie le texte en supprimant les caractères spéciaux et en mettant en minuscules."""
-    text = str(text).lower()
-    text = unidecode(text)  # Convertit "génial" en "genial"
-    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)  # Supprime la ponctuation et caractères spéciaux
-    text = re.sub(r"\s+", " ", text).strip()  # Supprime les espaces en trop
+def clean_text(text: str) -> str:
+    """Nettoie le texte en supprimant les accents et la ponctuation."""
+    text = unicodedata.normalize('NFKD', text)
+    text = ''.join(c for c in text if not unicodedata.combining(c))
+    text = text.lower()
+    text = text.replace("'", " ")
+    text = re.sub(r'[^a-z0-9\s]', '', text)
+    text = re.sub(r'\s+', ' ', text).strip()
     return text
 
-def label_sentiment(score):
-    """Convertit les scores en catégories de sentiment."""
+
+def label_sentiment(score: int) -> str:
+    """Convertit un score numérique en label de sentiment."""
     if score <= 2:
         return "negative"
-    elif score == 3:
+    if 3 <= score <= 4:
         return "neutral"
-    else:
-        return "positive"
+    return "positive"
 
-def preprocess_data(df):
-    """Applique le nettoyage et la tokenisation des textes."""
-    # Vérifier si les colonnes existent
-    if "content" not in df.columns or "score" not in df.columns:
-        print(f"Colonnes disponibles : {df.columns}")
-        raise KeyError("Les colonnes 'content' et 'score' sont absentes du fichier CSV.")
 
-    df = df.dropna(subset=["content", "score"])  # Supprimer les lignes avec valeurs manquantes
-    df["clean_text"] = df["content"].apply(clean_text)  # Nettoyage
-    df["tokens"] = df["clean_text"].apply(lambda x: tokenizer(x, padding="max_length", truncation=True))  # Tokenisation
-    df["sentiment"] = df["score"].apply(label_sentiment)  # Attribution des labels
-
+def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Prétraite un DataFrame contenant du texte et des scores."""
+    df = df.copy()
+    df["clean_text"] = df["content"].apply(clean_text)
+    df["tokens"] = df["clean_text"].apply(lambda x: x.split())
+    df["sentiment"] = df["score"].apply(label_sentiment)
     return df
-
-# Test rapide
-if __name__ == "__main__":
-    df = pd.read_csv(r'C:\Users\moudi\sentiment-analysis-pipeline\dataset.csv')
-    df = preprocess_data(df)
-    print(df[["content", "clean_text", "tokens", "sentiment"]].head())

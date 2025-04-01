@@ -1,0 +1,52 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Dockerfile'
+      - 'src/**'
+      - 'requirements.txt'
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4  # Version mise à jour
+
+      - name: Set IMAGE_NAME environment variable
+        run: |
+          REPO="${{ github.repository_owner }}/${{ github.event.repository.name }}"
+          # Nettoyage plus robuste du nom
+          REPO_CLEAN=$(echo "$REPO" | tr '[:upper:]' '[:lower:]' | tr '_' '-' | sed 's/[^a-z0-9-]//g' | sed 's/-\+/-/g' | sed 's/^-//;s/-$//')
+          echo "IMAGE_NAME=ghcr.io/${REPO_CLEAN}" >> $GITHUB_ENV
+          echo "Using image name: ${IMAGE_NAME}"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5  # Action officielle plus fiable
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.repository_url }}
+            org.opencontainers.image.created=${{ steps.date.outputs.date }}
+
+      - name: Sanity check (test run)
+        if: success()  # Exécution conditionnelle
+        run: |
+          docker run --rm -d -p 8080:8080 --name test-container ${{ env.IMAGE_NAME }}:latest
+          sleep 10  # Attente du démarrage
+          docker logs test-container
+          docker stop test-container

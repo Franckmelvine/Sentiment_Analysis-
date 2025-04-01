@@ -1,2 +1,30 @@
+<<<<<<< HEAD
 venv/
 venv/
+=======
+# Exclure l'environnement virtuel
+venv/
+
+# Exclure les fichiers cachés de macOS
+.DS_Store
+
+# Exclure les fichiers de cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Exclure les fichiers de configuration personnelle
+.env
+.vscode/
+.idea/
+
+# Exclure les fichiers de données temporaires
+*.log
+*.sqlite3
+
+# Exclure les fichiers de build/distribution
+build/
+dist/
+*.egg-info/
+>>>>>>> 814322e459e605fbb43a43f362e9785e62f23d5d
