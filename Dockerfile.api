@@ -1,0 +1,29 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Installation des outils système nécessaires
+RUN apt-get update && apt-get install -y \
+    gcc \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Mise à jour de pip
+RUN pip install --upgrade pip
+
+# Installer spacy à part (plus stable)
+RUN pip install --no-cache-dir spacy==3.7.2
+
+# Copier requirements.txt
+COPY requirements.txt .
+
+# Installer les autres dépendances avec timeout et retries plus élevés
+RUN pip install --retries=15 --timeout=300 --no-cache-dir \
+    -r requirements.txt \
+    -i https://pypi.org/simple
+
+# Copier le dossier src (contenant API + code)
+COPY src/ ./src
+
+# Définir le point d'entrée pour l'API
+CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]

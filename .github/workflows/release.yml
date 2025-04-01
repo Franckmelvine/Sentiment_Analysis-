@@ -1,0 +1,28 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up GitHub CLI
+        run: sudo apt-get install gh
+
+      - name: Create Release using GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh auth setup-git
+<<<<<<< HEAD
+          gh release create ${{ github.ref_name }} --title "Release ${{ github.ref_name }}" --notes "Automated release created by GitHub Actions"
+=======
+          gh release create ${{ github.ref_name }} --title "Release ${{ github.ref_name }}" --notes "Automated release created by GitHub Actions"
+>>>>>>> bb9f5fe07db2a3cb6f6a3586a4399506d3f4d14e

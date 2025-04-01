@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+venv/
+venv/
+=======
 # Exclure l'environnement virtuel
 venv/
 
@@ -23,3 +27,4 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+>>>>>>> 814322e459e605fbb43a43f362e9785e62f23d5d
