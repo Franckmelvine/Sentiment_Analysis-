@@ -1,0 +1,10 @@
+**/__pycache__
+**/.git
+**/.venv
+**/venv
+**/*.jpg
+**/*.png
+**/*.csv
+**/*.pdf
+**/test.txt
+**/preprocessed_dataset.csv

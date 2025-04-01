@@ -1,14 +1,30 @@
-# Utiliser une image Python légère
-FROM python:3.10-slim
+# Utilise une image plus légère avec Python 3.9
+FROM python:3.9-slim
 
-# Créer un répertoire de travail dans le conteneur
+# Désactive les statistiques Streamlit et les warnings Python
+ENV BROWSER_GATHER_USAGE_STATS=False \
+    PYTHONWARNINGS="ignore::FutureWarning" \
+    STREAMLIT_SERVER_PORT=8000
+
 WORKDIR /app
 
-# Copier tous les fichiers du projet dans le conteneur
-COPY . .
+# Installation des dépendances système (optimisée)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Installer les dépendances Python
-RUN pip install --no-cache-dir -r requirements.txt
+# Installation des dépendances Python en une seule couche (meilleure pratique Docker)
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    python -m spacy download fr_core_news_sm && \
+    python -m nltk.downloader popular  # Si vous utilisez NLTK
 
-# Démarrer FastAPI avec Uvicorn
-CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Copie des fichiers de l'application (en deux étapes pour mieux utiliser le cache Docker)
+COPY src/ src/
+COPY *.py ./
+
+# Exposition du port et commande de démarrage
+EXPOSE 8000
+CMD ["streamlit", "run", "src/app.py", "--server.port=8000", "--server.address=0.0.0.0"]
