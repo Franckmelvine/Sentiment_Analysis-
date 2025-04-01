@@ -1,59 +1,55 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
+import pandas as pd
 from datasets import Dataset
-import torch
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    Trainer,
+    TrainingArguments,
+)
+from src.data_processing import preprocess_data
 
-def load_model_and_tokenizer():
-    """Charge le modèle et le tokenizer."""
-    model_name = "arindamatcalgm/w266_model4_BERT_AutoModelForSequenceClassification"
+
+def load_model_and_tokenizer(model_name):
+    """Charge le modèle pré-entraîné et le tokenizer."""
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForSequenceClassification.from_pretrained(model_name)
     return tokenizer, model
 
-def preprocess_data(tokenizer, examples):
-    """Tokenise les données textuelles."""
-    return tokenizer(examples['content'], padding="max_length", truncation=True)
 
-def fine_tune_model(tokenizer, model, dataset):
+def fine_tune_model(model_name, dataset_path, output_dir="./results"):
     """Affine le modèle sur l'ensemble de données."""
-    # Tokeniser le dataset
-    tokenized_dataset = dataset.map(lambda x: preprocess_data(tokenizer, x), batched=True)
+    tokenizer, model = load_model_and_tokenizer(model_name)
 
-    # Diviser le dataset en train et test
+    df = pd.read_csv(dataset_path)
+    dataset = Dataset.from_pandas(df)
+    tokenized_dataset = dataset.map(
+        lambda x: preprocess_data(tokenizer, x), batched=True
+    )
     train_test_split = tokenized_dataset.train_test_split(test_size=0.1)
-    train_dataset = train_test_split['train']
-    test_dataset = train_test_split['test']
 
-    # Définir les arguments d'entraînement
     training_args = TrainingArguments(
-        output_dir="./results",
+        output_dir=output_dir,
         evaluation_strategy="epoch",
+        save_strategy="epoch",
         learning_rate=2e-5,
         per_device_train_batch_size=16,
         per_device_eval_batch_size=16,
         num_train_epochs=3,
         weight_decay=0.01,
+        logging_dir=f"{output_dir}/logs",
+        logging_steps=10,
     )
 
-    # Définir le Trainer
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=test_dataset,
+        train_dataset=train_test_split["train"],
+        eval_dataset=train_test_split["test"],
     )
 
-    # Affiner le modèle
     trainer.train()
+    model.save_pretrained(output_dir)
+    tokenizer.save_pretrained(output_dir)
+    model.config.to_json_file(f"{output_dir}/config.json")
+
     return trainer
-
-if __name__ == "__main__":
-    # Charger le modèle et le tokenizer
-    tokenizer, model = load_model_and_tokenizer()
-
-    # Charger votre dataset (supposons que vous avez un DataFrame pandas `df`)
-    import pandas as pd
-    df = pd.read_csv(r"C:\Users\mouke\Documents\aivancity\PGE3\Semestre 2\MLOps\dataset.csv")  # Remplacez par le chemin de votre dataset
-    dataset = Dataset.from_pandas(df)
-
-    # Affiner le modèle
-    fine_tune_model(tokenizer, model, dataset)

@@ -1,7 +1,11 @@
-spacy>=3.8.0,<4.0.0
-fr-core-news-sm==3.8.0  # Package de langue français
+spacy==3.7.2
+transformers==4.40.1
+datasets==2.19.1
+torch==2.1.0
 pandas==2.2.2
-transformers==4.49.0
-torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
 fastapi==0.115.8
 uvicorn==0.34.0
+streamlit==1.32.0
+matplotlib
+requests
+scikit-learn
