@@ -1,62 +1,55 @@
-import torch
 import pandas as pd
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trainer, TrainingArguments
 from datasets import Dataset
-from sklearn.model_selection import train_test_split
-
-def load_data(file_path):
-    df = pd.read_csv(file_path)
-    df = df[['content', 'score']].dropna()
-    df['score'] = df['score'] - 1  # Transformer les labels en 0-4 si c'est sur 1-5
-    return df
-
-def tokenize_function(examples):
-    return tokenizer(examples['content'], padding='max_length', truncation=True)
-
-# Charger les données
-data_path = 'reviews.csv'  # Modifier avec le chemin correct
-df = load_data(data_path)
-
-# Diviser en train et test
-train_texts, test_texts, train_labels, test_labels = train_test_split(
-    df['content'].tolist(), df['score'].tolist(), test_size=0.2, random_state=42
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    Trainer,
+    TrainingArguments,
 )
+from src.data_processing import preprocess_data
 
-# Convertir en Dataset Hugging Face
-train_dataset = Dataset.from_dict({'content': train_texts, 'score': train_labels})
-test_dataset = Dataset.from_dict({'content': test_texts, 'score': test_labels})
 
-# Charger le modèle et le tokenizer
-model_name = 'nlptown/bert-base-multilingual-uncased-sentiment'  # Modèle BERT pré-entraîné
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=5)
+def load_model_and_tokenizer(model_name):
+    """Charge le modèle pré-entraîné et le tokenizer."""
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSequenceClassification.from_pretrained(model_name)
+    return tokenizer, model
 
-# Tokenization
-tokenized_train = train_dataset.map(tokenize_function, batched=True)
-tokenized_test = test_dataset.map(tokenize_function, batched=True)
 
-# Définir les arguments d'entraînement
-training_args = TrainingArguments(
-    output_dir='./results',
-    evaluation_strategy='epoch',
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
-    num_train_epochs=3,
-    weight_decay=0.01,
-    logging_dir='./logs',
-)
+def fine_tune_model(model_name, dataset_path, output_dir="./results"):
+    """Affine le modèle sur l'ensemble de données."""
+    tokenizer, model = load_model_and_tokenizer(model_name)
 
-# Initialiser le Trainer
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=tokenized_train,
-    eval_dataset=tokenized_test,
-)
+    df = pd.read_csv(dataset_path)
+    dataset = Dataset.from_pandas(df)
+    tokenized_dataset = dataset.map(
+        lambda x: preprocess_data(tokenizer, x), batched=True
+    )
+    train_test_split = tokenized_dataset.train_test_split(test_size=0.1)
 
-# Entraîner le modèle
-trainer.train()
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        evaluation_strategy="epoch",
+        save_strategy="epoch",
+        learning_rate=2e-5,
+        per_device_train_batch_size=16,
+        per_device_eval_batch_size=16,
+        num_train_epochs=3,
+        weight_decay=0.01,
+        logging_dir=f"{output_dir}/logs",
+        logging_steps=10,
+    )
 
-# Sauvegarder le modèle
-tokenizer.save_pretrained('./saved_model')
-model.save_pretrained('./saved_model')
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_test_split["train"],
+        eval_dataset=train_test_split["test"],
+    )
+
+    trainer.train()
+    model.save_pretrained(output_dir)
+    tokenizer.save_pretrained(output_dir)
+    model.config.to_json_file(f"{output_dir}/config.json")
+
+    return trainer

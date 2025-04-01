@@ -1,32 +1,33 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
-
 import unittest
-from data_processing import clean_text, remove_stopwords, lemmatize_text, encode_text  # Changé ici
+import pandas as pd
+from src.data_processing import clean_text, preprocess_data, label_sentiment
 
-class TestDataPreprocessing(unittest.TestCase):
 
+class TestDataProcessing(unittest.TestCase):
     def test_clean_text(self):
-        text = "Hello World! 123"
-        result = clean_text(text)
-        self.assertEqual(result, "hello world")
+        self.assertEqual(clean_text("Hello, World!"), "hello world")
+        self.assertEqual(clean_text("C'est génial!! 123"), "c est genial 123")
+        self.assertEqual(clean_text("Déjà vu! Ça marche?"), "deja vu ca marche")
 
-    def test_remove_stopwords(self):
-        text = "This is a test sentence."
-        result = remove_stopwords(text)
-        self.assertEqual(result, "test sentence.")
+    def test_label_sentiment(self):
+        self.assertEqual(label_sentiment(1), "negative")
+        self.assertEqual(label_sentiment(3), "neutral")
+        self.assertEqual(label_sentiment(5), "positive")
 
-    def test_lemmatize_text(self):
-        text = "running better"
-        result = lemmatize_text(text)
-        self.assertEqual(result, "running better")
+    def test_preprocess_data(self):
+        test_df = pd.DataFrame({
+            "content": ["Excellent!", "Terrible..."],
+            "score": [5, 1]
+        })
+        processed_df = preprocess_data(test_df)
 
-    def test_encode_text(self):
-        text = "hello"
-        result = encode_text(text)
-        self.assertTrue('input_ids' in result)
-        self.assertTrue('attention_mask' in result)
+        self.assertEqual(processed_df.shape[0], 2)
+        self.assertListEqual(
+            processed_df["sentiment"].tolist(),
+            ["positive", "negative"]
+        )
+        self.assertEqual(processed_df["clean_text"].iloc[0], "excellent")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
