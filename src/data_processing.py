@@ -1,71 +1,32 @@
-import pandas as pd
-from data_extraction import data  # Importez data 
-
 import re
-import nltk
-nltk.download('stopwords')
-nltk.download('wordnet')
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from transformers import BertTokenizer
+import pandas as pd
+import unicodedata
 
-# Importer le dataset depuis data_atraction.py
-from data_extraction import data  # Assurez-vous que data_atraction.py contient un DataFrame nommé 'data'
 
-data = data.copy()  # Faire une copie pour éviter de modifier l'original
-
-# Nettoyage du texte
-def clean_text(text):
-    text = re.sub(r'[^\w\s]', '', str(text))  # Supprimer les caractères spéciaux
-    text = text.lower()  # Convertir en minuscules
-    text = re.sub(r'\d+', '', text)  # Supprimer les nombres
+def clean_text(text: str) -> str:
+    """Nettoie le texte en supprimant les accents et la ponctuation."""
+    text = unicodedata.normalize('NFKD', text)
+    text = ''.join(c for c in text if not unicodedata.combining(c))
+    text = text.lower()
+    text = text.replace("'", " ")
+    text = re.sub(r'[^a-z0-9\s]', '', text)
+    text = re.sub(r'\s+', ' ', text).strip()
     return text
 
-data['content'] = data['content'].apply(clean_text)
 
-# Suppression des stop words
-stop_words = set(stopwords.words('english'))
-def remove_stopwords(text):
-    return ' '.join([word for word in text.split() if word not in stop_words])
+def label_sentiment(score: int) -> str:
+    """Convertit un score numérique en label de sentiment."""
+    if score <= 2:
+        return "negative"
+    if 3 <= score <= 4:
+        return "neutral"
+    return "positive"
 
-data['content'] = data['content'].apply(remove_stopwords)
 
-# Lemmatisation
-lemmatizer = WordNetLemmatizer()
-def lemmatize_text(text):
-    return ' '.join([lemmatizer.lemmatize(word) for word in text.split()])
-
-data['content'] = data['content'].apply(lemmatize_text)
-
-# Tokenization avec BERT
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-
-def encode_text(text):
-    return tokenizer.encode_plus(
-        text,
-        add_special_tokens=True,
-        max_length=128,
-        padding='max_length',
-        truncation=True,
-        return_attention_mask=True,
-        return_tensors='pt'
-    )
-
-data['encoded'] = data['content'].apply(encode_text)
-
-# Extraction des tokens et des masques d'attention
-input_ids = data['encoded'].apply(lambda x: x['input_ids'].squeeze().tolist())
-attention_masks = data['encoded'].apply(lambda x: x['attention_mask'].squeeze().tolist())
-
-data['input_ids'] = input_ids
-data['attention_mask'] = attention_masks
-
-# Supprimer la colonne encodée intermédiaire
-data.drop(columns=['encoded'], inplace=True)
-
-# Sauvegarder le DataFrame prétraité
-data.to_csv('preprocessed_dataset.csv', index=False)
-
-import os
-print(os.getcwd())  # Affiche le répertoire actuel
-
+def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Prétraite un DataFrame contenant du texte et des scores."""
+    df = df.copy()
+    df["clean_text"] = df["content"].apply(clean_text)
+    df["tokens"] = df["clean_text"].apply(lambda x: x.split())
+    df["sentiment"] = df["score"].apply(label_sentiment)
+    return df
