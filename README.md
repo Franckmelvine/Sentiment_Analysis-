@@ -3,7 +3,7 @@
 [![Tests](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/test.yml/badge.svg)](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/test.yml)
 [![Evaluate](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/evaluate.yml/badge.svg)](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/evaluate.yml)
 [![Build](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/build.yml/badge.svg)](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/build.yml)
-[![Release](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/release.yml/badge.svg)](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/release.yml)   
+[![Release](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/release.yml/badge.svg)](https://github.com/Franckmelvine/Sentiment_Analysis-/actions/workflows/release.yml)
 
 ---
 
